@@ -6,16 +6,12 @@
 
 typedef unsigned int uint;
 
-struct adjNode{
-    uint distance;
-    uint elem;
-    struct adjNode* next;
-};
-typedef struct adjNode* listNode;
 
 struct h{
     uint distance;
-    listNode point;
+    uint currentPosition;
+    uint* distanceArr;
+    uint* elemArr;
 };
 typedef struct h* headList;
 
@@ -30,7 +26,8 @@ uint rowLength;
 uint maxNumberTopGraph;
 uint currentNumberTopGraph=0;
 
-
+void addElementToList(headList list, uint distance, uint elem);
+headList createList();
 minHeap createMinHeap();
 void addNewElementMinHeap(minHeap heap, headList head);
 void minHeapFixUp(minHeap heap, uint pos);
@@ -56,7 +53,7 @@ minHeap createMinHeap() {
     minHeap heap = (minHeap) malloc(sizeof(struct minHeapNode));
     heap->maxSize = rowLength;
     heap->currentSize = 0;
-    heap->head = (headList*) malloc(sizeof(headList) * rowLength);
+    heap->head = (headList *) malloc(sizeof(headList) * (rowLength + 1));
 
     return heap;
 }
@@ -141,20 +138,15 @@ uint djkRun2() {
     headList adjList[rowLength];
 
     for(int i=0; i<rowLength; i++){
-        adjList[i] = (headList) malloc(sizeof (headList));
-        adjList[i]->point = (listNode) malloc(sizeof (listNode));
-        adjList[i]->point = NULL;
-        adjList[i]->distance=INFINITY;
-
+        adjList[i] = createList();
+        adjList[i]->distance = INFINITY;
         for(int j=0; j<rowLength; j++){
             if(i!=j && j!=0){
                 uint d;
                 scanf("%u,", &d);
-                listNode toAdd = (listNode) malloc(sizeof (listNode));
-                toAdd->next=adjList[i]->point;
-                adjList[i]->point = toAdd;
-                toAdd->distance = d;
-                toAdd->elem = j;
+                if(d>0){
+                    addElementToList(adjList[i], d, j);
+                }
             }
             else {
                 uint d;
@@ -166,6 +158,14 @@ uint djkRun2() {
     }
 
     printTest(heap);
+    for(int i=0; i<rowLength; i++){
+        free(adjList[i]->elemArr);
+        free(adjList[i]->distanceArr);
+        free(adjList[i]);
+    }
+    free(heap->head);
+    free(heap);
+
 
     /*for(int i=1; i<rowLength; i++){
         if(matrix[0][i] > 0){
@@ -219,4 +219,21 @@ void printTest(minHeap heap) {
         printf("Key: %u\n", heap->head[i]->distance);
     }
     printf("\n");
+}
+
+headList createList() {
+
+    headList list = (headList) malloc(sizeof(struct h));
+    list->currentPosition = 1;
+    list->distanceArr = (uint*) malloc(sizeof (uint)*2);
+    list->elemArr = (uint*) malloc(sizeof (uint)*2);
+
+    return list;
+}
+
+void addElementToList(headList list, uint distance, uint elem) {
+    list->elemArr[list->currentPosition] = distance;
+    list->elemArr[list->currentPosition] = elem;
+    list->currentPosition++;
+    list->elemArr = (uint*) realloc(list->elemArr, sizeof (uint)*(list->currentPosition+1));
 }
