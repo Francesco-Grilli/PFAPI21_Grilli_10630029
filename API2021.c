@@ -12,13 +12,14 @@ struct h{
     uint currentPosition;
     uint* distanceArr;
     uint* elemArr;
+    uint minHeapPosition;
 };
 typedef struct h* headList;
 
 struct minHeapNode{
     headList *head;
     uint currentSize;
-    uint maxSize;
+
 };
 typedef struct minHeapNode* minHeap;
 
@@ -51,7 +52,6 @@ int main(){
 
 minHeap createMinHeap() {
     minHeap heap = (minHeap) malloc(sizeof(struct minHeapNode));
-    heap->maxSize = rowLength;
     heap->currentSize = 0;
     heap->head = (headList *) malloc(sizeof(headList) * (rowLength + 1));
 
@@ -63,6 +63,7 @@ void addNewElementMinHeap(minHeap heap, headList head){
 
     heap->currentSize++;
     heap->head[heap->currentSize] = head;
+    heap->head[heap->currentSize]->minHeapPosition=heap->currentSize;
 
     minHeapFixUp(heap, heap->currentSize);
 
@@ -78,7 +79,9 @@ void minHeapFixUp(minHeap heap, uint pos) {
 void minHeapSwapElement(minHeap heap, uint f, uint s) {
     headList father = heap->head[f];
     heap->head[f] = heap->head[s];
+    heap->head[f]->minHeapPosition = f;
     heap->head[s] = father;
+    heap->head[s]->minHeapPosition = s;
 }
 
 headList getMinHeapElement(minHeap heap) {
@@ -157,15 +160,22 @@ uint djkRun2() {
         addNewElementMinHeap(heap, adjList[i]);
     }
 
-    printTest(heap);
-    for(int i=0; i<rowLength; i++){
-        free(adjList[i]->elemArr);
-        free(adjList[i]->distanceArr);
-        free(adjList[i]);
-    }
-    free(heap->head);
-    free(heap);
 
+
+
+    adjList[0]->distance=0;
+    printTest(heap);
+    while(!emptyMinHeap(heap)){
+        headList u = getMinHeapElement(heap);
+        for(int i=1; i<u->currentPosition; i++){
+            if(adjList[u->elemArr[i]]->distance > (u->distanceArr[i] + u->distance)){
+                adjList[u->elemArr[i]]->distance = (u->distanceArr[i] + u->distance);
+                minHeapFixUp(heap, adjList[u->elemArr[i]]->minHeapPosition);
+            }
+        }
+    }
+
+    printTest(heap);
 
     /*for(int i=1; i<rowLength; i++){
         if(matrix[0][i] > 0){
@@ -212,10 +222,18 @@ uint djkRun2() {
     free(heap);
 
     return sum;*/
+
+    for(int i=0; i<rowLength; i++){
+        free(adjList[i]->elemArr);
+        free(adjList[i]->distanceArr);
+        free(adjList[i]);
+    }
+    free(heap->head);
+    free(heap);
 }
 
 void printTest(minHeap heap) {
-    for(int i=1; i<heap->currentSize; i++){
+    for(int i=1; i<=heap->currentSize; i++){
         printf("Key: %u\n", heap->head[i]->distance);
     }
     printf("\n");
@@ -232,7 +250,7 @@ headList createList() {
 }
 
 void addElementToList(headList list, uint distance, uint elem) {
-    list->elemArr[list->currentPosition] = distance;
+    list->distanceArr[list->currentPosition] = distance;
     list->elemArr[list->currentPosition] = elem;
     list->currentPosition++;
     list->elemArr = (uint*) realloc(list->elemArr, sizeof (uint)*(list->currentPosition+1));
