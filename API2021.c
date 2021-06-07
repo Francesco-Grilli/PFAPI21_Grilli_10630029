@@ -47,6 +47,8 @@ void printTest(minHeap heap);
 int main(){
     scanf("%u %u", &rowLength, &maxNumberTopGraph);
     djkRun2();
+
+    return 0;
 }
 
 
@@ -54,7 +56,7 @@ minHeap createMinHeap() {
     minHeap heap = (minHeap) malloc(sizeof(struct minHeapNode));
     heap->maxSize = rowLength;
     heap->currentSize = 0;
-    heap->head = (headList *) (headList) malloc(sizeof(headList) * rowLength);
+    heap->head = (headList*) malloc(sizeof(headList) * rowLength);
 
     return heap;
 }
@@ -140,6 +142,7 @@ uint djkRun2() {
 
     for(int i=0; i<rowLength; i++){
         adjList[i] = (headList) malloc(sizeof (headList));
+        adjList[i]->point = (listNode) malloc(sizeof (listNode));
         adjList[i]->point = NULL;
         adjList[i]->distance=INFINITY;
 
