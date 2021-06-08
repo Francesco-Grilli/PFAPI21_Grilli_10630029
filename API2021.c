@@ -164,10 +164,10 @@ uint djkRun2() {
 
 
     adjList[0]->distance=0;
-    printTest(heap);
+    minHeapFixUp(heap, adjList[0]->minHeapPosition);
     while(!emptyMinHeap(heap)){
         headList u = getMinHeapElement(heap);
-        for(int i=1; i<u->currentPosition; i++){
+        for(int i=1; i<=u->currentPosition; i++){
             if(adjList[u->elemArr[i]]->distance > (u->distanceArr[i] + u->distance)){
                 adjList[u->elemArr[i]]->distance = (u->distanceArr[i] + u->distance);
                 minHeapFixUp(heap, adjList[u->elemArr[i]]->minHeapPosition);
@@ -175,53 +175,12 @@ uint djkRun2() {
         }
     }
 
-    printTest(heap);
-
-    /*for(int i=1; i<rowLength; i++){
-        if(matrix[0][i] > 0){
-            addNewElementMinHeap(heap, matrix[0][i], i);
-        }
+    uint sum=0;
+    for(int i=0; i<rowLength; i++){
+        if(adjList[i]->distance < INFINITY)
+            sum += adjList[i]->distance;
     }
-
-    while (counter < rowLength && !emptyHeap(heap)) {
-        uint* arr = getMinHeapElement(heap);
-        uint distance = arr[0];
-        uint elem = arr[1];
-        free(arr);
-
-        while(visitedNode[elem] == 1 && !emptyHeap(heap)){
-            arr = getMinHeapElement(heap);
-            distance = arr[0];
-            elem = arr[1];
-            free(arr);
-        }
-        if(!emptyHeap(heap)) {
-
-
-            //adding a fewer cost to the distanceNode array
-            visitedNode[elem] = 1;
-            distanceNode[elem] = distance;
-            counter++;
-
-            for (int i = 1; i < rowLength; i++) {
-                if (visitedNode[i] != 1 && matrix[elem][i] > 0) {
-                    addNewElementMinHeap(heap, matrix[elem][i] + distance, i);
-                }
-            }
-        }
-    }
-    uint sum =0;
-    for (int i = 1; i < rowLength; i++) {
-        if(distanceNode[i]==INFINITY)
-            distanceNode[i]=0;
-        sum = sum + distanceNode[i];
-    }
-
-    free(heap->arrayCost);
-    free(heap->arrayElem);
-    free(heap);
-
-    return sum;*/
+    printf("%u\n", sum);
 
     for(int i=0; i<rowLength; i++){
         free(adjList[i]->elemArr);
@@ -242,7 +201,7 @@ void printTest(minHeap heap) {
 headList createList() {
 
     headList list = (headList) malloc(sizeof(struct h));
-    list->currentPosition = 1;
+    list->currentPosition = 0;
     list->distanceArr = (uint*) malloc(sizeof (uint)*2);
     list->elemArr = (uint*) malloc(sizeof (uint)*2);
 
@@ -250,8 +209,9 @@ headList createList() {
 }
 
 void addElementToList(headList list, uint distance, uint elem) {
+    list->currentPosition++;
     list->distanceArr[list->currentPosition] = distance;
     list->elemArr[list->currentPosition] = elem;
-    list->currentPosition++;
-    list->elemArr = (uint*) realloc(list->elemArr, sizeof (uint)*(list->currentPosition+1));
+    list->elemArr = (uint*) realloc(list->elemArr, sizeof (uint)*(list->currentPosition+2));
+    list->distanceArr = (uint*) realloc(list->distanceArr, sizeof (uint)*(list->currentPosition+2));
 }
