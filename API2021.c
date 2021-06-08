@@ -19,7 +19,6 @@ typedef struct h* headList;
 struct minHeapNode{
     headList *head;
     uint currentSize;
-
 };
 typedef struct minHeapNode* minHeap;
 
@@ -27,6 +26,9 @@ uint rowLength;
 uint maxNumberTopGraph;
 uint currentNumberTopGraph=0;
 
+/**
+ * FUNCTION TO CREATE MIN HEAP AND ADJACENCY LIST FOR DIJKSTRA ALGORITHM
+ */
 void addElementToList(headList list, uint distance, uint elem);
 headList createList();
 minHeap createMinHeap();
@@ -37,9 +39,10 @@ void removeMinHeapElement(minHeap heap);
 headList getMinHeapElement(minHeap heap);
 int emptyMinHeap(minHeap heap);
 void minHeapFixDown(minHeap heap, uint pos);
-int compareString(char* string1, char* string2);
 uint djkRun2();
 void printTest(minHeap heap);
+
+int compareString(char* string1, char* string2);
 
 
 int main(){
