@@ -77,10 +77,11 @@ int main(){
         scanf("%s", command);
         if (compareString(command, "AggiungiGrafo"))
             addGraph();
-        else
+        else if(compareString(command, "TopK"))
             showTopK();
-    }
-    while(stdin!=NULL);
+
+    }while(!feof(stdin));
+
 
     return 0;
 }
@@ -204,7 +205,7 @@ uint djkRun2() {
     while(!emptyMinHeap(heap)){
         headList u = getMinHeapElement(heap);
         for(int i=1; i<=u->currentPosition; i++){
-            if(adjList[u->elemArr[i]]->distance > (u->distanceArr[i] + u->distance)){
+            if(adjList[u->elemArr[i]]->distance > (u->distanceArr[i] + u->distance) && u->distance!=INFINITY){
                 adjList[u->elemArr[i]]->distance = (u->distanceArr[i] + u->distance);
                 minHeapFixUp(heap, adjList[u->elemArr[i]]->minHeapPosition);
             }
