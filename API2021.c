@@ -65,22 +65,25 @@ int emptyMaxHeap(maxHeap heap);
 void addGraph();
 void showTopK();
 
-int compareString(char* string1, char* string2);
+int compareString(const char* string1, const char* string2);
 
 
 int main(){
-    scanf("%u %u", &rowLength, &maxNumberTopGraph);
+    if (scanf("%u %u", &rowLength, &maxNumberTopGraph)){}
     topKHeap = createMaxHeap();
 
-    do {
-        char command[13];
-        scanf("%s", command);
-        if (compareString(command, "AggiungiGrafo"))
-            addGraph();
-        else if(compareString(command, "TopK"))
-            showTopK();
+    while(!feof(stdin)){
+        char command[14];
+        if(scanf("%s", command)){}
 
-    }while(!feof(stdin));
+        if(feof(stdin))
+            return 0;
+        if(compareString(command, "AggiungiGrafo")){
+            addGraph();
+        }
+        else
+            showTopK();
+    }
 
 
     return 0;
@@ -147,7 +150,7 @@ void removeMinHeapElement(minHeap heap) {
 
 void minHeapFixDown(minHeap heap, uint pos) {
     while(pos*2 <= heap->currentSize){
-        int nPos = pos*2;
+        uint nPos = pos*2;
         if(nPos < heap->currentSize && heap->head[nPos+1]->distance < heap->head[nPos]->distance)
             nPos++;    //going to the right child
         if(heap->head[pos]->distance <= heap->head[nPos]->distance)
@@ -158,7 +161,7 @@ void minHeapFixDown(minHeap heap, uint pos) {
     }
 }
 
-int compareString(char *string1, char *string2) {
+int compareString(const char *string1, const char *string2) {
     int i=0;
     int ret = 0;
 
@@ -174,7 +177,8 @@ int compareString(char *string1, char *string2) {
 
 uint djkRun2() {
 
-    minHeap heap = createMinHeap();
+    minHeap heap;
+    heap = createMinHeap();
     headList adjList[rowLength];
 
     for(int i=0; i<rowLength; i++){
@@ -183,41 +187,36 @@ uint djkRun2() {
         for(int j=0; j<rowLength; j++){
             if(i!=j && j!=0){
                 uint d;
-                scanf("%u,", &d);
+                if(scanf("%u,", &d)){}
+
                 if(d>0){
                     addElementToList(adjList[i], d, j);
                 }
             }
             else {
                 uint d;
-                scanf("%u,",&d);
+                if (scanf("%u,", &d)){}
             }
         }
-
         addNewElementMinHeap(heap, adjList[i]);
     }
 
 
 
-
+    uint sum=0;
     adjList[0]->distance=0;
     minHeapFixUp(heap, adjList[0]->minHeapPosition);
     while(!emptyMinHeap(heap)){
         headList u = getMinHeapElement(heap);
+        if(u->distance<INFINITY)
+            sum +=u->distance;
         for(int i=1; i<=u->currentPosition; i++){
-            if(adjList[u->elemArr[i]]->distance > (u->distanceArr[i] + u->distance) && u->distance!=INFINITY){
+            if(adjList[u->elemArr[i]]->distance > (u->distanceArr[i] + u->distance) && u->distance<INFINITY){
                 adjList[u->elemArr[i]]->distance = (u->distanceArr[i] + u->distance);
                 minHeapFixUp(heap, adjList[u->elemArr[i]]->minHeapPosition);
             }
         }
     }
-
-    uint sum=0;
-    for(int i=0; i<rowLength; i++){
-        if(adjList[i]->distance < INFINITY)
-            sum += adjList[i]->distance;
-    }
-    printf("%u\n", sum); //TO REMOVE
 
     for(int i=0; i<rowLength; i++){
         free(adjList[i]->elemArr);
@@ -228,13 +227,6 @@ uint djkRun2() {
     free(heap);
 
     return sum;
-}
-
-void printTest(minHeap heap) {
-    for(int i=1; i<=heap->currentSize; i++){
-        printf("Key: %u\n", heap->head[i]->distance);
-    }
-    printf("\n");
 }
 
 headList createList() {
@@ -275,7 +267,7 @@ void removeMaxHeapElement(maxHeap heap) {
 
 void maxHeapFixDown(maxHeap heap, uint pos) {
     while(pos*2 <= heap->currentSize){
-        int nPos = pos*2;
+        uint nPos = pos*2;
         if(nPos < heap->currentSize && heap->arrayCost[nPos+1] > heap->arrayCost[nPos])
             nPos++; //if the right child is bigger, going to the right child
         else if(heap->arrayCost[nPos + 1] == heap->arrayCost[nPos] && heap->arrayElem[nPos + 1] > heap->arrayElem[nPos])
