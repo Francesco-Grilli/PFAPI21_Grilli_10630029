@@ -4,52 +4,51 @@
 
 #define INFINITY 4294967295
 
-typedef unsigned int uint;
-
+typedef unsigned int ubig;
 
 struct h{
-    uint distance;
-    uint currentPosition;
-    uint maxPosition;
-    uint* distanceArr;
-    uint* elemArr;
-    uint minHeapPosition;
+    ubig distance;
+    ubig currentPosition;
+    ubig maxPosition;
+    ubig* distanceArr;
+    ubig* elemArr;
+    ubig minHeapPosition;
 };
 typedef struct h* headList;
 
 struct minHeapNode{
     headList *head;
-    uint currentSize;
+    ubig currentSize;
 };
 typedef struct minHeapNode* minHeap;
 
 struct maxHeapNode{
-    uint* arrayCost;
-    uint* arrayElem;
-    uint currentSize;
-    uint maxSize;
+    ubig* arrayCost;
+    ubig* arrayElem;
+    ubig currentSize;
+    ubig maxSize;
 };
 typedef struct maxHeapNode* maxHeap;
 
-uint rowLength;
-uint maxNumberTopGraph;
-uint currentNumberTopGraph=0;
+ubig rowLength;
+ubig maxNumberTopGraph;
+ubig currentNumberTopGraph=0;
 maxHeap topKHeap;
 
 /**
  * FUNCTION TO CREATE MIN HEAP AND ADJACENCY LIST FOR DIJKSTRA ALGORITHM
  */
-void addElementToList(headList list, uint distance, uint elem);
+void addElementToList(headList list, ubig distance, ubig elem);
 headList createList();
 minHeap createMinHeap();
 void addNewElementMinHeap(minHeap heap, headList head);
-void minHeapFixUp(minHeap heap, uint pos);
-void minHeapSwapElement(minHeap heap, uint f, uint s);
+void minHeapFixUp(minHeap heap, ubig pos);
+void minHeapSwapElement(minHeap heap, ubig f, ubig s);
 void removeMinHeapElement(minHeap heap);
 headList getMinHeapElement(minHeap heap);
 int emptyMinHeap(minHeap heap);
-void minHeapFixDown(minHeap heap, uint pos);
-uint djkRun2();
+void minHeapFixDown(minHeap heap, ubig pos);
+ubig djkRun2();
 void printTest(minHeap heap);
 void addNewSpaceList(headList list);
 
@@ -58,12 +57,12 @@ void addNewSpaceList(headList list);
  */
 maxHeap createMaxHeap();
 void removeMaxHeapElement(maxHeap heap);
-void maxHeapFixDown(maxHeap heap, uint pos);
-void addNewElementMaxHeap(maxHeap heap, uint key, uint prevElem);
-void maxHeapFixUp(maxHeap heap, uint pos);
-void maxHeapSwapElement(maxHeap heap, uint f, uint s);
+void maxHeapFixDown(maxHeap heap, ubig pos);
+void addNewElementMaxHeap(maxHeap heap, ubig key, ubig prevElem);
+void maxHeapFixUp(maxHeap heap, ubig pos);
+void maxHeapSwapElement(maxHeap heap, ubig f, ubig s);
 int emptyMaxHeap(maxHeap heap);
-void maxHeapInsertDelete(maxHeap heap, uint key, uint prevElem);
+void maxHeapInsertDelete(maxHeap heap, ubig key, ubig prevElem);
 
 void addGraph();
 void showTopK();
@@ -113,14 +112,14 @@ void addNewElementMinHeap(minHeap heap, headList head){
 
 }
 
-void minHeapFixUp(minHeap heap, uint pos) {
+void minHeapFixUp(minHeap heap, ubig pos) {
     while(pos>1 && heap->head[pos]->distance < heap->head[pos/2]->distance){
         minHeapSwapElement(heap, pos / 2, pos);
         pos = pos/2;
     }
 }
 
-void minHeapSwapElement(minHeap heap, uint f, uint s) {
+void minHeapSwapElement(minHeap heap, ubig f, ubig s) {
     headList father = heap->head[f];
     heap->head[f] = heap->head[s];
     heap->head[f]->minHeapPosition = f;
@@ -152,9 +151,9 @@ void removeMinHeapElement(minHeap heap) {
     }
 }
 
-void minHeapFixDown(minHeap heap, uint pos) {
+void minHeapFixDown(minHeap heap, ubig pos) {
     while(pos*2 <= heap->currentSize){
-        uint nPos = pos*2;
+        ubig nPos = pos * 2;
         if(nPos < heap->currentSize && heap->head[nPos+1]->distance < heap->head[nPos]->distance)
             nPos++;    //going to the right child
         if(heap->head[pos]->distance <= heap->head[nPos]->distance)
@@ -181,20 +180,20 @@ int compareString(const char *string1, const char *string2) {
 
 }
 
-uint djkRun2() {
+ubig djkRun2() {
 
     minHeap heap;
     heap = createMinHeap();
     headList adjList[rowLength];
     int zeroFirstRow=0;
     int allEquals=0;
-    uint elemEquals;
+    ubig elemEquals;
 
     adjList[0] = createList();
     adjList[0]->distance=0;
     if (scanf("%u,", &elemEquals)){}
     for(int i=1; i<rowLength; i++){
-        uint d;
+        ubig d;
         if(scanf("%u,", &d)){}
         if(d>0){
             addElementToList(adjList[0], d, i);
@@ -205,7 +204,7 @@ uint djkRun2() {
     }
 
     if(zeroFirstRow==0){
-        uint d;
+        ubig d;
         for(int i=1; i<rowLength; i++){
             for(int j=0; j<rowLength; j++){
                 if(scanf("%u,", &d)){}
@@ -228,7 +227,7 @@ uint djkRun2() {
         adjList[i]->distance = INFINITY;
 
         for(int j=0; j<rowLength; j++){
-            uint d;
+            ubig d;
             if(scanf("%u,", &d)){}
 
             if(i!=j && j!=0 && d>0){
@@ -241,7 +240,7 @@ uint djkRun2() {
     }
 
     if(allEquals==0){
-        uint c = elemEquals * (rowLength-1);
+        ubig c = elemEquals * (rowLength - 1);
         for(int i=0; i<rowLength; i++){
             free(adjList[i]->elemArr);
             free(adjList[i]->distanceArr);
@@ -252,7 +251,7 @@ uint djkRun2() {
         return c;
     }
 
-    uint sum=0;
+    ubig sum=0;
     while(!emptyMinHeap(heap)){
         headList u = getMinHeapElement(heap);
         if(u->distance<INFINITY)
@@ -281,13 +280,13 @@ headList createList() {
     headList list = (headList) malloc(sizeof(struct h));
     list->currentPosition = 0;
     list->maxPosition = 2;
-    list->distanceArr = (uint*) malloc(sizeof (uint)*(list->maxPosition+1));
-    list->elemArr = (uint*) malloc(sizeof (uint)*(list->maxPosition+1));
+    list->distanceArr = (ubig*) malloc(sizeof (ubig) * (list->maxPosition + 1));
+    list->elemArr = (ubig*) malloc(sizeof (ubig) * (list->maxPosition + 1));
 
     return list;
 }
 
-void addElementToList(headList list, uint distance, uint elem) {
+void addElementToList(headList list, ubig distance, ubig elem) {
     if(list->currentPosition >= list->maxPosition)
         addNewSpaceList(list);
 
@@ -298,9 +297,9 @@ void addElementToList(headList list, uint distance, uint elem) {
 }
 
 void addNewSpaceList(headList list){
-    uint max = list->maxPosition*2;
-    list->elemArr = (uint*) realloc(list->elemArr, (sizeof (uint))*(max+1));
-    list->distanceArr = (uint*) realloc(list->distanceArr, (sizeof (uint)*(max+1)));
+    ubig max = list->maxPosition * 2;
+    list->elemArr = (ubig*) realloc(list->elemArr, (sizeof (ubig)) * (max + 1));
+    list->distanceArr = (ubig*) realloc(list->distanceArr, (sizeof (ubig) * (max + 1)));
     list->maxPosition = max;
 }
 
@@ -308,8 +307,8 @@ maxHeap createMaxHeap() {
     maxHeap heap = (maxHeap) malloc(sizeof (struct maxHeapNode));
     heap->maxSize = maxNumberTopGraph;
     heap->currentSize = 0;
-    heap->arrayCost = (uint*) malloc(sizeof (uint)*(maxNumberTopGraph + 1));
-    heap->arrayElem = (uint*) malloc(sizeof (uint)*(maxNumberTopGraph + 1));
+    heap->arrayCost = (ubig*) malloc(sizeof (ubig) * (maxNumberTopGraph + 1));
+    heap->arrayElem = (ubig*) malloc(sizeof (ubig) * (maxNumberTopGraph + 1));
 
     return heap;
 }
@@ -322,11 +321,12 @@ void removeMaxHeapElement(maxHeap heap) {
     }
 }
 
-void maxHeapFixDown(maxHeap heap, uint pos) {
+void maxHeapFixDown(maxHeap heap, ubig pos) {
     while(pos*2 <= heap->currentSize){
-        uint nPos = pos*2;
-        if(nPos < heap->currentSize && (heap->arrayCost[nPos+1] > heap->arrayCost[nPos] || (heap->arrayCost[nPos + 1] == heap->arrayCost[nPos] && heap->arrayElem[nPos + 1] > heap->arrayElem[nPos])))
+        ubig nPos = pos * 2;
+        if(nPos < heap->currentSize && (heap->arrayCost[nPos+1] > heap->arrayCost[nPos] || (heap->arrayCost[nPos + 1] == heap->arrayCost[nPos] && heap->arrayElem[nPos + 1] > heap->arrayElem[nPos]))) {
             nPos++; //if the right child is bigger, going to the right child
+        }
 
         if(heap->arrayCost[pos] > heap->arrayCost[nPos] || (heap->arrayCost[pos] == heap->arrayCost[nPos] && heap->arrayElem[pos] > heap->arrayElem[nPos])){
             break;      //have already swapped everything
@@ -337,24 +337,28 @@ void maxHeapFixDown(maxHeap heap, uint pos) {
     }
 }
 
-void addNewElementMaxHeap(maxHeap heap, uint key, uint prevElem) {
+void addNewElementMaxHeap(maxHeap heap, ubig key, ubig prevElem) {
 
-    heap->currentSize++;
-    heap->arrayCost[heap->currentSize] = key;
-    heap->arrayElem[heap->currentSize] = prevElem;
+    if(heap->currentSize <= heap->maxSize) {
+        heap->currentSize++;
+        heap->arrayCost[heap->currentSize] = key;
+        heap->arrayElem[heap->currentSize] = prevElem;
 
-    maxHeapFixUp(heap, heap->currentSize);
+        maxHeapFixUp(heap, heap->currentSize);
+    }
 }
 
-void maxHeapFixUp(maxHeap heap, uint pos) {
+void maxHeapFixUp(maxHeap heap, ubig pos) {
     while(pos>1 && (heap->arrayCost[pos] > heap->arrayCost[pos/2] || (heap->arrayCost[pos] == heap->arrayCost[pos/2] && heap->arrayElem[pos] > heap->arrayElem[pos/2]))){
-        maxHeapSwapElement(heap, pos / 2, pos);
+        ubig s = pos / 2;
+        maxHeapSwapElement(heap, pos, s);
         pos = pos/2;
     }
 }
 
 void addGraph() {
-    uint key = djkRun2();
+    ubig key = djkRun2();
+    printf("%u", key);
     if(currentNumberTopGraph >= maxNumberTopGraph){
         if(key < topKHeap->arrayCost[1]) {
             maxHeapInsertDelete(topKHeap, key, currentNumberTopGraph);
@@ -372,9 +376,9 @@ void showTopK() {
     printf("\n");
 }
 
-void maxHeapSwapElement(maxHeap heap, uint f, uint s) {
-    uint elemF = heap->arrayElem[f];
-    uint costF = heap->arrayCost[f];
+void maxHeapSwapElement(maxHeap heap, ubig f, ubig s) {
+    ubig elemF = heap->arrayElem[f];
+    ubig costF = heap->arrayCost[f];
     heap->arrayElem[f] = heap->arrayElem[s];
     heap->arrayCost[f] = heap->arrayCost[s];
     heap->arrayElem[s] = elemF;
@@ -385,7 +389,7 @@ int emptyMaxHeap(maxHeap heap) {
     return heap->currentSize<=0;
 }
 
-void maxHeapInsertDelete(maxHeap heap, uint key, uint prevElem) {
+void maxHeapInsertDelete(maxHeap heap, ubig key, ubig prevElem) {
 
     heap->arrayCost[1] = key;
     heap->arrayElem[1] = prevElem;
