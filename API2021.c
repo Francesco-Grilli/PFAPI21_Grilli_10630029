@@ -74,6 +74,7 @@ int compareString(const char* string1, const char* string2);
 int main(){
     if (scanf("%u %u", &rowLength, &maxNumberTopGraph)){}
     topKHeap = createMaxHeap();
+    char s[14] = "AggiungiGrafo";
 
     while(!feof(stdin)){
         char command[14];
@@ -81,7 +82,7 @@ int main(){
 
         if(feof(stdin))
             return 0;
-        if(compareString(command, "AggiungiGrafo")){
+        if(compareString(command, s)){
             addGraph();
         }
         else
@@ -186,16 +187,21 @@ uint djkRun2() {
     heap = createMinHeap();
     headList adjList[rowLength];
     int zeroFirstRow=0;
+    int allEquals=0;
+    uint elemEquals;
 
     adjList[0] = createList();
     adjList[0]->distance=0;
-    for(int i=0; i<rowLength; i++){
+    if (scanf("%u,", &elemEquals)){}
+    for(int i=1; i<rowLength; i++){
         uint d;
         if(scanf("%u,", &d)){}
-        if(d>0 && i!=0){
+        if(d>0){
             addElementToList(adjList[0], d, i);
             zeroFirstRow=1;
         }
+        if(d!=elemEquals)
+            allEquals=1;
     }
 
     if(zeroFirstRow==0){
@@ -205,6 +211,13 @@ uint djkRun2() {
                 if(scanf("%u,", &d)){}
             }
         }
+
+        free(adjList[0]->elemArr);
+        free(adjList[0]->distanceArr);
+        free(adjList[0]);
+        free(heap->head);
+        free(heap);
+
         return 0;
     }
     else
@@ -221,11 +234,23 @@ uint djkRun2() {
             if(i!=j && j!=0 && d>0){
                 addElementToList(adjList[i], d, j);
             }
+            if(d!=elemEquals)
+                allEquals=1;
         }
         addNewElementMinHeap(heap, adjList[i]);
     }
 
-
+    if(allEquals==0){
+        uint c = elemEquals * (rowLength-1);
+        for(int i=0; i<rowLength; i++){
+            free(adjList[i]->elemArr);
+            free(adjList[i]->distanceArr);
+            free(adjList[i]);
+        }
+        free(heap->head);
+        free(heap);
+        return c;
+    }
 
     uint sum=0;
     while(!emptyMinHeap(heap)){
@@ -283,8 +308,8 @@ maxHeap createMaxHeap() {
     maxHeap heap = (maxHeap) malloc(sizeof (struct maxHeapNode));
     heap->maxSize = maxNumberTopGraph;
     heap->currentSize = 0;
-    heap->arrayCost = (uint*) malloc(sizeof (uint)*(heap->maxSize + 1));
-    heap->arrayElem = (uint*) malloc(sizeof (uint)*(heap->maxSize + 1));
+    heap->arrayCost = (uint*) malloc(sizeof (uint)*(maxNumberTopGraph + 1));
+    heap->arrayElem = (uint*) malloc(sizeof (uint)*(maxNumberTopGraph + 1));
 
     return heap;
 }
@@ -330,13 +355,13 @@ void maxHeapFixUp(maxHeap heap, uint pos) {
 
 void addGraph() {
     uint key = djkRun2();
-    if(currentNumberTopGraph < maxNumberTopGraph){
-        addNewElementMaxHeap(topKHeap, key, currentNumberTopGraph);
-    }
-    else{
+    if(currentNumberTopGraph >= maxNumberTopGraph){
         if(key < topKHeap->arrayCost[1]) {
             maxHeapInsertDelete(topKHeap, key, currentNumberTopGraph);
         }
+    }
+    else{
+        addNewElementMaxHeap(topKHeap, key, currentNumberTopGraph);
     }
     currentNumberTopGraph++;
 }
