@@ -77,16 +77,14 @@ int main(){
 
     while(!feof(stdin)) {
         char* command = (char *) malloc(sizeof (char)*14);
-        if (scanf("%s", command)==1) {
-            if (strcmp(command, "AggiungiGrafo") == 0) {
-                addGraph();
-            } else if (strcmp(command, "TopK") == 0) {
-                showTopK();
-            } else {
-                free(command);
-                return 0;
-            }
+        if (scanf("%s", command)) {}
+        if (strcmp(command, "AggiungiGrafo") == 0) {
+            addGraph();
+        } else if (strcmp(command, "TopK") == 0) {
+            showTopK();
         }
+        else
+            break;
         free(command);
     }
     return 0;
@@ -114,7 +112,7 @@ void addNewElementMinHeap(minHeap heap, headList head){
 
 void minHeapFixUp(minHeap heap, ubig pos) {
     while(pos>1 && heap->head[pos]->distance < heap->head[pos/2]->distance){
-        minHeapSwapElement(heap, pos / 2, pos);
+        minHeapSwapElement(heap, (pos/2), pos);
         pos = pos/2;
     }
 }
@@ -182,12 +180,13 @@ int compareString(const char *string1, const char *string2) {
 
 }
 
+
 ubig djkRun2() {
 
     minHeap heap = createMinHeap();
-    headList* adjList = (headList*) malloc(sizeof (headList)*rowLength);
-    int zeroFirstRow=0;
-    int allEquals=0;
+    headList* adjList = (headList*) malloc(sizeof (headList)*(rowLength));
+    ubig zeroFirstRow=0;
+    ubig allEquals=0;
     ubig elemEquals;
 
     adjList[0] = createList();
