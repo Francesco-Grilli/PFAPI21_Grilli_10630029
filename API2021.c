@@ -35,6 +35,8 @@ ulong numberNode;
 ulong numberTopK;
 ulong currentId=0;
 maxHeap mHeap;
+headList* list;
+minHeap heap;
 
 headList createList();
 void addElemToList(headList head, ubig distance, ulong elem);
@@ -43,7 +45,7 @@ void addMinHeapElement(minHeap heap, headList list);
 void minHeapFixUp(minHeap heap, ulong pos);
 void minHeapSwapElement(minHeap heap, ulong f, ulong s);
 headList getMinHeapElement(minHeap heap);
-int minHeapNotEmpty(minHeap heap);
+short int minHeapNotEmpty(minHeap heap);
 void removeMinHeap(minHeap heap);
 void minHeapFixDown(minHeap heap, ulong pos);
 
@@ -60,23 +62,31 @@ void maxHeapFixDown(maxHeap heap, ulong pos);
 
 void addGraph();
 
+void clearAll();
+
+void initializeAll();
+
 int main() {
 
     if (scanf("%lu %lu", &numberNode, &numberTopK)) {
-        mHeap = createMaxHeap();
+
+        initializeAll();
 
         while (!feof(stdin)) {
 
             char c[14];
-            if (scanf("%s", c));
+            if (scanf("%s", c)) {
 
-            if (feof(stdin))
-                return 0;
+                if (feof(stdin))
+                    return 0;
 
-            if (strcmp(c, "AggiungiGrafo") == 0)
-                addGraph();
-            else if (strcmp(c, "TopK") == 0)
-                printMaxHeap(mHeap);
+                if (strcmp(c, "AggiungiGrafo") == 0)
+                    addGraph();
+                else if (strcmp(c, "TopK") == 0)
+                    printMaxHeap(mHeap);
+            }
+            else
+                return -1;
         }
 
         return 0;
@@ -84,6 +94,16 @@ int main() {
     else
         return -1;
 
+}
+
+void initializeAll() {
+    list = (headList*) malloc(sizeof (headList)*numberNode);
+    ulong i;
+    for(i=0; i<numberNode; i++)
+        list[i]=createList();
+    heap = createMinHeap();
+
+    mHeap = createMaxHeap();
 }
 
 void addGraph() {
@@ -196,7 +216,7 @@ void minHeapFixDown(minHeap heap, ulong pos) {
 
 }
 
-int minHeapNotEmpty(minHeap heap) {
+short int minHeapNotEmpty(minHeap heap) {
     if(heap->currentSize<=0)
         return 0;
     else
@@ -205,12 +225,9 @@ int minHeapNotEmpty(minHeap heap) {
 
 ubig djkRun() {
 
-    headList* list = (headList*) malloc(sizeof (headList)*numberNode);
-    minHeap heap = createMinHeap();
-
     ulong i, j;
 
-    list[0] = createList();
+    //list[0] = createList();
     list[0]->distance=0;
     for(i=0; i<numberNode; i++){
         ubig d;
@@ -224,7 +241,7 @@ ubig djkRun() {
     addMinHeapElement(heap, list[0]);
 
     for(i=1; i<numberNode; i++){
-        list[i] = createList();
+        //list[i] = createList();
         list[i]->distance=INF;
         for(j=0; j<numberNode; j++){
             ubig d;
@@ -255,16 +272,28 @@ ubig djkRun() {
 
     }
 
-    for(i=0; i<numberNode; i++){
+    clearAll();
+
+    /*for(i=0; i<numberNode; i++){
         free(list[i]->elemArr);
         free(list[i]->distanceArr);
         free(list[i]);
     }
     free(list);
     free(heap->head);
-    free(heap);
+    free(heap);*/
 
     return sum;
+
+}
+
+void clearAll() {
+
+    ulong i;
+    for(i=0; i<numberNode; i++){
+        list[i]->currentSize=0;
+    }
+    heap->currentSize=0;
 
 }
 
@@ -345,5 +374,3 @@ void printMaxHeap(maxHeap heap) {
     }
     printf("\n");
 }
-
-
