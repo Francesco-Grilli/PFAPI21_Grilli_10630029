@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 
 typedef unsigned long int ubig;
 typedef unsigned int ul;
@@ -14,8 +15,8 @@ struct h {
     ubig* distanceArr;
     ul heapPosition;
     ul currentSize;
-    short int inHeap;
-    short int wasInHeap;
+    bool inHeap;
+    bool wasInHeap;
 };
 typedef struct h* headList;
 
@@ -148,8 +149,8 @@ minHeap createMinHeap() {
 void addMinHeapElement(minHeap heap, headList list) {
     heap->currentSize++;
     heap->head[heap->currentSize] = list;
-    list->inHeap=1;
-    list->wasInHeap=1;
+    list->inHeap=true;
+    list->wasInHeap=true;
     list->heapPosition=heap->currentSize;
 
     minHeapFixUp(heap, heap->currentSize);
@@ -177,7 +178,7 @@ headList getMinHeapElement(minHeap heap) {
     if(minHeapNotEmpty(heap)==1){
 
         headList u = heap->head[1];
-        u->inHeap=0;
+        u->inHeap=false;
         removeMinHeap(heap);
         return u;
 
@@ -333,18 +334,33 @@ ubig djkRun(){
     ul i, j;
     ubig value;
     ubig start;
-    short int allEquals=1;
+    bool allEquals=true;
+    bool allZero=true;
 
     if(scanf("%lu,", &start));
     for(i=1; i<numberNode; i++){
 
         if(scanf("%lu,", &value));
-        if(value>0)
+        if(value>0) {
             addElemToList(list[0], value, i);
+            allZero=false;
+        }
         if(value!=start)
-            allEquals=0;
+            allEquals=false;
 
     }
+
+    if(allZero){
+        for(i=1; i<numberNode; i++) {
+            for (j = 0; j < numberNode; j++) {
+                if(scanf("%lu,", &value));
+            }
+        }
+        clearAll();
+        return 0;
+
+    }
+
     list[0]->distance=0;
     addMinHeapElement(heap, list[0]);
 
@@ -353,17 +369,17 @@ ubig djkRun(){
         for(j=0; j<numberNode; j++){
 
             if(scanf("%lu,", &value));
-            if(value>0)
+            if(value>0 && i!=j)
                 addElemToList(list[i], value, j);
             if(value!=start)
-                allEquals=0;
+                allEquals=false;
 
         }
 
         list[i]->distance=INF;
     }
 
-    if(allEquals==1){
+    if(allEquals){
         clearAll();
         return value*(numberNode-1);
     }
@@ -377,11 +393,11 @@ ubig djkRun(){
             sum+=u->distance;
 
         for(i=0; i<u->currentSize; i++){
-            if(list[u->elemArr[i]]->wasInHeap==0){
+            if(!list[u->elemArr[i]]->wasInHeap){
                 list[u->elemArr[i]]->distance=u->distance + u->distanceArr[i];
                 addMinHeapElement(heap, list[u->elemArr[i]]);
             }
-            else if(list[u->elemArr[i]]->inHeap==1){
+            else if(list[u->elemArr[i]]->inHeap){
                 ubig alt = u->distance + u->distanceArr[i];
                 if(list[u->elemArr[i]]->distance > alt){
                     list[u->elemArr[i]]->distance=alt;
