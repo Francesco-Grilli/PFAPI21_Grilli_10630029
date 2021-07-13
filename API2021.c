@@ -119,52 +119,6 @@ void addGraph() {
 
 }
 
-    for(i=1; i<numberNode; i++){
-
-        for(j=0; j<numberNode; j++){
-
-            if(scanf("%lu,", &value));
-            if(value>0 && i!=j)
-                addElemToList(list[i], value, j);
-            if(value!=start)
-                allEquals=false;
-
-        }
-
-        list[i]->distance=INF;
-    }
-
-    if(allEquals){
-        clearAll();
-        return value*(numberNode-1);
-    }
-
-    ubig sum=0;
-
-    do{
-        headList u = getMinHeapElement(heap);
-
-        if(u->distance<INF)
-            sum+=u->distance;
-
-        for(i=0; i<u->currentSize; i++){
-            if(!list[u->elemArr[i]]->wasInHeap){
-                list[u->elemArr[i]]->distance=u->distance + u->distanceArr[i];
-                addMinHeapElement(heap, list[u->elemArr[i]]);
-            }
-            else if(list[u->elemArr[i]]->inHeap==1){
-                ubig alt = u->distance + u->distanceArr[i];
-                if(list[u->elemArr[i]]->distance > alt){
-                    list[u->elemArr[i]]->distance=alt;
-                    minHeapFixUp(heap, list[u->elemArr[i]]->heapPosition);
-                }
-            }
-
-        }
-    }while(heap->currentSize>0);
-
-    clearAll();
-    return sum;
 
 headList createList(){
 
@@ -542,10 +496,9 @@ void maxHeapFixDown(maxHeap heap, ul pos) {
 
 void printMaxHeap(maxHeap heap) {
     ul s;
-    for(s=1; s<=heap->currentSize; s++){
-        printf("%u", heap->graphId[s]);
-        if(s<heap->currentSize)
-            printf(" ");
+    for(s=1; s<heap->currentSize; s++){
+        printf("%u ", heap->graphId[s]);
     }
+    printf("%u", heap->graphId[heap->currentSize]);
     printf("\n");
 }
