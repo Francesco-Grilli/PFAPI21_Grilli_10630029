@@ -318,7 +318,9 @@ void addGraph(){
 void showTopK(){
     unsigned long int i;
     for(i=1; i <= topKHeap->currentSize; i++){
-        printf("%lu ", topKHeap->graphId[i]);
+        printf("%lu", topKHeap->graphId[i]);
+        if(i<topKHeap->currentSize)
+            printf(" ");
     }
     printf("\n");
 
