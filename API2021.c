@@ -20,6 +20,8 @@ struct h {
 };
 typedef struct h* headList;
 
+
+
 struct l {
     headList* head;
     ul currentSize;
@@ -47,20 +49,19 @@ void addMinHeapElement(minHeap heap, headList list);
 void minHeapFixUp(minHeap heap, ul pos);
 void minHeapSwapElement(minHeap heap, ul f, ul s);
 headList getMinHeapElement(minHeap heap);
-short int minHeapNotEmpty(minHeap heap);
 void removeMinHeap(minHeap heap);
 void minHeapFixDown(minHeap heap, ul pos);
 
 maxHeap createMaxHeap();
-void addMaxHeapElement(maxHeap heap, ubig d, ul id);
-void maxHeapFixUp(maxHeap heap, ul pos);
-void maxHeapSwapElement(maxHeap heap, ul f, ul s);
-void maxHeapInsertRemove(maxHeap heap, ubig d, ul id);
-void printMaxHeap(maxHeap heap);
+void addMaxHeapElement(ubig d, ul id);
+void maxHeapFixUp(ul pos);
+void maxHeapSwapElement(ul f, ul s);
+void maxHeapInsertRemove(ubig d, ul id);
+void printMaxHeap();
 
 ubig djkRun();
 
-void maxHeapFixDown(maxHeap heap, ul pos);
+void maxHeapFixDown(ul pos);
 
 void addGraph();
 
@@ -74,9 +75,10 @@ int main() {
 
         initializeAll();
 
+        char c[14];
+
         while (!feof(stdin)) {
 
-            char c[14];
             if (scanf("%s", c)) {
 
                 if (feof(stdin))
@@ -87,8 +89,6 @@ int main() {
                 else if (strcmp(c, "TopK") == 0)
                     printMaxHeap(mHeap);
             }
-            else
-                return -1;
         }
 
         return 0;
@@ -110,11 +110,11 @@ void initializeAll() {
 void addGraph() {
 
     ubig d = djkRun();
-    if(currentId < numberTopK){
-        addMaxHeapElement(mHeap, d, currentId);
-    }
-    else
-        maxHeapInsertRemove(mHeap, d, currentId);
+    if(currentId < numberTopK)
+        addMaxHeapElement(d, currentId);
+    else if(d < mHeap->distance[1])
+        maxHeapInsertRemove(d, currentId);
+
     currentId++;
 
 }
@@ -175,7 +175,7 @@ void minHeapSwapElement(minHeap heap, ul f, ul s) {
 
 headList getMinHeapElement(minHeap heap) {
 
-    if(minHeapNotEmpty(heap)==1){
+    if(heap->currentSize>0){
 
         headList u = heap->head[1];
         u->inHeap=false;
@@ -190,7 +190,7 @@ headList getMinHeapElement(minHeap heap) {
 
 void removeMinHeap(minHeap heap) {
 
-    if(minHeapNotEmpty(heap)==1){
+    if(heap->currentSize>0){
         if(heap->currentSize>1)
             minHeapSwapElement(heap, 1, heap->currentSize);
         heap->currentSize--;
@@ -217,13 +217,6 @@ void minHeapFixDown(minHeap heap, ul pos) {
 
     }
 
-}
-
-short int minHeapNotEmpty(minHeap heap) {
-    if(heap->currentSize<=0)
-        return 0;
-    else
-        return 1;
 }
 
 /*ubig djkRun() {
@@ -390,7 +383,7 @@ ubig djkRun(){
         headList u = getMinHeapElement(heap);
 
         if(u->distance<INF)
-            sum+=u->distance;
+            sum += u->distance;
 
         for(i=0; i<u->currentSize; i++){
             if(!list[u->elemArr[i]]->wasInHeap){
@@ -404,7 +397,6 @@ ubig djkRun(){
                     minHeapFixUp(heap, list[u->elemArr[i]]->heapPosition);
                 }
             }
-
         }
     }while(heap->currentSize>0);
 
@@ -433,72 +425,71 @@ maxHeap createMaxHeap() {
     return u;
 }
 
-void addMaxHeapElement(maxHeap heap, ubig d, ul id) {
+void addMaxHeapElement(ubig d, ul id) {
 
-    heap->currentSize++;
-    heap->distance[heap->currentSize] = d;
-    heap->graphId[heap->currentSize] = id;
-    maxHeapFixUp(heap, heap->currentSize);
+    mHeap->currentSize++;
+    mHeap->distance[mHeap->currentSize] = d;
+    mHeap->graphId[mHeap->currentSize] = id;
+    maxHeapFixUp(mHeap->currentSize);
 
 }
 
-void maxHeapFixUp(maxHeap heap, ul pos) {
+void maxHeapFixUp(ul pos) {
 
     while(pos>1){
         ul sPos = pos / 2;
-        if((heap->distance[pos] > heap->distance[pos/2]) || (heap->distance[pos]==heap->distance[pos/2] && heap->graphId[pos] > heap->graphId[pos/2])){
-            maxHeapSwapElement(heap, pos, sPos);
+        if((mHeap->distance[pos] > mHeap->distance[pos/2]) || (mHeap->distance[pos]==mHeap->distance[pos/2] && mHeap->graphId[pos] > mHeap->graphId[pos/2])){
+            maxHeapSwapElement(pos, sPos);
         }
         pos = sPos;
     }
 
 }
 
-void maxHeapSwapElement(maxHeap heap, ul f, ul s) {
+void maxHeapSwapElement(ul f, ul s) {
 
-    ubig fDistance = heap->distance[f];
-    ul fId = heap->graphId[f];
-    heap->distance[f] = heap->distance[s];
-    heap->graphId[f] = heap->graphId[s];
-    heap->distance[s] = fDistance;
-    heap->graphId[s] = fId;
-
-}
-
-void maxHeapInsertRemove(maxHeap heap, ubig d, ul id) {
-
-    if(heap->distance[1]>d) {
-        heap->distance[1] = d;
-        heap->graphId[1] = id;
-        maxHeapFixDown(heap, 1);
-    }
+    ubig fDistance = mHeap->distance[f];
+    ul fId = mHeap->graphId[f];
+    mHeap->distance[f] = mHeap->distance[s];
+    mHeap->graphId[f] = mHeap->graphId[s];
+    mHeap->distance[s] = fDistance;
+    mHeap->graphId[s] = fId;
 
 }
 
-void maxHeapFixDown(maxHeap heap, ul pos) {
+void maxHeapInsertRemove(ubig d, ul id) {
 
-    while(pos*2 <= heap->currentSize){
+    mHeap->distance[1] = d;
+    mHeap->graphId[1] = id;
+    maxHeapFixDown(1);
+
+}
+
+void maxHeapFixDown(ul pos) {
+
+    while(pos*2 <= mHeap->currentSize){
         ul sPos = pos * 2;
-        if(sPos < heap->currentSize){
-            if((heap->distance[sPos+1] > heap->distance[sPos]) || (heap->distance[sPos+1] == heap->distance[sPos] && heap->graphId[sPos+1] > heap->graphId[sPos])){
+        if(sPos < mHeap->currentSize){
+            if((mHeap->distance[sPos+1] > mHeap->distance[sPos]) || (mHeap->distance[sPos+1] == mHeap->distance[sPos] && mHeap->graphId[sPos+1] > mHeap->graphId[sPos])){
                 sPos++;
             }
         }
-        if((heap->distance[pos] > heap->distance[sPos]) || (heap->distance[pos] == heap->distance[sPos] && heap->graphId[pos] > heap->graphId[sPos])){
+        if((mHeap->distance[pos] > mHeap->distance[sPos]) || (mHeap->distance[pos] == mHeap->distance[sPos] && mHeap->graphId[pos] > mHeap->graphId[sPos])){
             return;
         }
-        maxHeapSwapElement(heap, pos, sPos);
+        maxHeapSwapElement(pos, sPos);
         pos = sPos;
 
     }
 
 }
 
-void printMaxHeap(maxHeap heap) {
+void printMaxHeap() {
     ul s;
-    for(s=1; s<heap->currentSize; s++){
-        printf("%u ", heap->graphId[s]);
+    for(s=1; s<mHeap->currentSize; s++){
+        printf("%u ", mHeap->graphId[s]);
     }
-    printf("%u", heap->graphId[heap->currentSize]);
+    printf("%u", mHeap->graphId[mHeap->currentSize]);
     printf("\n");
 }
+
