@@ -87,10 +87,18 @@ int main() {
         scanf("%s\n", c);
 
         if(!strcmp(c, "AggiungiGrafo")){
-            addGraph();
+            ul i, j;
+            ubig d;
+            for(i=0; i<numberNode; i++){
+                for(j=0; j<numberNode-1; j++){
+                    scanf("%llu,", &d);
+                }
+                scanf("%llu\n", &d);
+            }
+            //addGraph();
         }
         else if(!strcmp(c, "TopK")) {
-            printMaxHeap();
+            //printMaxHeap();
         }
     }
     freeAll();
