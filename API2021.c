@@ -4,10 +4,16 @@
 #include <math.h>
 #include <stdbool.h>
 
-typedef unsigned long int ubig;
-typedef unsigned int ul;
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif __GNUC__
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif
 
-const unsigned long  int INF = 4294967295;
+typedef unsigned long long  ubig;
+typedef unsigned long ul;
+
+const unsigned long INF = 4294967295;
 
 struct h {
     ubig distance;
@@ -68,34 +74,43 @@ void addGraph();
 void clearAll();
 
 void initializeAll();
+void freeAll();
 
 int main() {
 
-    if (scanf("%u %u", &numberNode, &numberTopK)) {
+    char c[14];
+    scanf("%lu %lu", &numberNode, &numberTopK);
+    initializeAll();
 
-        initializeAll();
+    while (!feof(stdin)) {
 
-        char c[14];
+        scanf("%s\n", c);
 
-        while (!feof(stdin)) {
-
-            if (scanf("%s", c)) {
-
-                if (feof(stdin))
-                    return 0;
-
-                if (strcmp(c, "AggiungiGrafo") == 0)
-                    addGraph();
-                else if (strcmp(c, "TopK") == 0)
-                    printMaxHeap(mHeap);
-            }
+        if(!strcmp(c, "AggiungiGrafo")){
+            addGraph();
         }
-
-        return 0;
+        else if(!strcmp(c, "TopK")) {
+            printMaxHeap();
+        }
     }
-    else
-        return -1;
+    freeAll();
+    return 0;
 
+}
+
+void freeAll(){
+    ul i;
+    free(heap->head);
+    free(heap);
+    free(mHeap->distance);
+    free(mHeap->graphId);
+    free(mHeap);
+    for(i=0; i<numberNode; i++){
+        free(list[i]->elemArr);
+        free(list[i]->distanceArr);
+        free(list[i]);
+    }
+    free(list);
 }
 
 void initializeAll() {
@@ -219,163 +234,24 @@ void minHeapFixDown(minHeap heap, ul pos) {
 
 }
 
-/*ubig djkRun() {
-
-    ul i, j;
-    int allEquals=1;
-    int allZero=1;
-
-    list[0]->distance=0;
-    ubig value;
-    if(scanf("%lu,", &value));
-
-    if(scanf("%lu,", &value)){
-        if (value > 0) {
-            addElemToList(list[0], value, 1);
-            allZero=0;
-        }
-    }
-
-    for(i=2; i<numberNode; i++){
-        ubig d;
-        if(scanf("%lu,", &d)) {
-            if(d!=value)
-                allEquals=0;
-            if (d > 0) {
-                addElemToList(list[0], d, i);
-                allZero=0;
-            }
-        }
-        else
-            return -1;
-    }
-
-    if(allZero==1){
-        for(i=1; i<numberNode; i++){
-            for(j=0; j<numberNode; j++){
-                if(scanf("%lu,", &value));
-            }
-        }
-        clearAll();
-        return 0;
-    }
-    else{
-        addMinHeapElement(heap, list[0]);
-    }
-
-    for(i=1; i<numberNode; i++){
-        list[i]->distance=INF;
-        for(j=0; j<numberNode; j++){
-            ubig d;
-            if(scanf("%lu,", &d)) {
-                if(d!=value)
-                    allEquals=0;
-
-                if (d > 0 && j!=0 && j!=i)
-                    addElemToList(list[i], d, j);
-            }
-            else
-                return -1;
-        }
-    }
-    if(allEquals==1){
-        clearAll();
-        return value*(numberNode-1);
-    }
-
-    ul k=0;
-    i=0;
-    while(i<numberNode){
-        for(k=0; k<numberNode; k++) {
-            for (j = 0; j < list[k]->currentSize; j++) {
-                if (list[list[k]->elemArr[j]]->inHeap == 0) {
-                    addMinHeapElement(heap, list[list[k]->elemArr[j]]);
-                    i++;
-                    if (i >= numberNode)
-                        break;
-                }
-            }
-        }
-        break;
-    }
-
-    ubig sum=0;
-
-    while(heap->currentSize>0){
-
-        headList u = getMinHeapElement(heap);
-        if(u->distance< INF)
-            sum = sum + u->distance;
-
-        for(i=0; i<u->currentSize; i++){
-                ubig alt = u->distance + u->distanceArr[i];
-                if(list[u->elemArr[i]]->inHeap==1 && list[u->elemArr[i]]->distance > alt) {
-                    list[u->elemArr[i]]->distance = alt;
-                    minHeapFixUp(heap, list[u->elemArr[i]]->heapPosition);
-                }
-            }
-    }
-
-    clearAll();
-
-    return sum;
-
-}*/
-
 ubig djkRun(){
 
     ul i, j;
     ubig value;
-    ubig start;
-    bool allEquals=true;
-    bool allZero=true;
+    ul nn = numberNode;
 
-    if(scanf("%lu,", &start));
-    for(i=1; i<numberNode; i++){
-
-        if(scanf("%lu,", &value));
-        if(value>0) {
-            addElemToList(list[0], value, i);
-            allZero=false;
+    for(i=0; i<nn; i++){
+        for(j=0; j<nn-1; j++){
+            scanf("%llu,", &value);
+            if(value>0)
+                addElemToList(list[i], value, j);
         }
-        if(value!=start)
-            allEquals=false;
-
+        scanf("%llu", &value);
+        if(value>0)
+            addElemToList(list[i], value, nn-1);
     }
-
-    if(allZero){
-        for(i=1; i<numberNode; i++) {
-            for (j = 0; j < numberNode; j++) {
-                if(scanf("%lu,", &value));
-            }
-        }
-        clearAll();
-        return 0;
-
-    }
-
     list[0]->distance=0;
     addMinHeapElement(heap, list[0]);
-
-    for(i=1; i<numberNode; i++){
-
-        for(j=0; j<numberNode; j++){
-
-            if(scanf("%lu,", &value));
-            if(value>0 && i!=j)
-                addElemToList(list[i], value, j);
-            if(value!=start)
-                allEquals=false;
-
-        }
-
-        list[i]->distance=INF;
-    }
-
-    if(allEquals){
-        clearAll();
-        return value*(numberNode-1);
-    }
 
     ubig sum=0;
 
@@ -487,9 +363,9 @@ void maxHeapFixDown(ul pos) {
 void printMaxHeap() {
     ul s;
     for(s=1; s<mHeap->currentSize; s++){
-        printf("%u ", mHeap->graphId[s]);
+        printf("%lu ", mHeap->graphId[s]);
     }
-    printf("%u", mHeap->graphId[mHeap->currentSize]);
+    printf("%lu", mHeap->graphId[mHeap->currentSize]);
     printf("\n");
 }
 
